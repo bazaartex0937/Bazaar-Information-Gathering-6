@@ -255,24 +255,47 @@ async function save() {
   } catch(e) {}
 }
 
-// ─── 自动网络连接 ───
+// ─── 改进的网络连接检测（多个备选方案） ───
 async function autoConnectNetwork() {
-  try {
-    const st = document.getElementById('netStatus');
-    const response = await fetch('https://www.google.com/generate_204', { 
-      method: 'HEAD',
-      mode: 'no-cors',
-      cache: 'no-store'
-    });
-    st.className = 'api-status as-ok';
-    st.textContent = '🌐 网络正常';
-    log('i', '🌐 网络连接正常');
-  } catch(e) {
-    const st = document.getElementById('netStatus');
-    st.className = 'api-status as-fail';
-    st.textContent = '❌ 网络异常';
-    log('w', '⚠️ 网络连接失败，将使用缓存数据');
+  const st = document.getElementById('netStatus');
+  
+  // 多个备选检测地址
+  const testUrls = [
+    'https://www.cloudflare.com/cdn-cgi/trace',
+    'https://www.baidu.com/img/baidu_jgylogo3.gif',
+    'https://www.aliyun.com',
+    'https://1.1.1.1/cdn-cgi/trace',
+    'https://dns.google/dns-query'
+  ];
+  
+  for (const url of testUrls) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(url, { 
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      st.className = 'api-status as-ok';
+      st.textContent = '🌐 网络正常';
+      log('i', `🌐 网络连接正常 (${url})`);
+      return true;
+    } catch(e) {
+      // 继续尝试下一个
+      log('w', `尝试 ${url} 失败，切换备选…`);
+    }
   }
+  
+  // 所有检测都失败
+  st.className = 'api-status as-fail';
+  st.textContent = '❌ 网络异常';
+  log('e', '⚠️ 网络连接失败，请检查网络设置。可继续使用缓存数据。');
+  return false;
 }
 
 // ─── 去重 key ───
@@ -317,6 +340,9 @@ async function callAPI(userMsg, useSearch = true, retries = 2) {
         body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
       }
       
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 
@@ -324,8 +350,10 @@ async function callAPI(userMsg, useSearch = true, retries = 2) {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify(body),
-        timeout: 30000
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!res.ok) {
         const t = await res.text();
@@ -368,7 +396,7 @@ const PROMPT_SYS = `You are a B2B lead finder specializing in down jacket and ou
 CRITICAL: For each person, actively search for their phone number on LinkedIn, company website, business directories (Dun & Bradstreet, ZoomInfo), or industry databases.
 
 Return ONLY valid JSON array. No markdown. No explanation. Format:
-[{"name":"Full Name","title":"Job Title","type":"brand|factory|agent","company":"Company","country":"Country","email":"email@example.com","phone":"+1-555-0123 or —","linkedin":"url or —","source":"website"}]
+[{"name":"Full Name","title":"Job Title","type":"brand|factory|agent","company":"Company","country":"Country","email":"email@example.com","phone":"+1-555-0123 or —","linkedin":"url or —","source":"..."}]
 
 Rules:
 - type: brand (retail/brand buyer) | factory (OEM procurement) | agent (sourcing agent)
@@ -465,10 +493,10 @@ async function startCrawl() {
 // ─── 添加示例数据 ───
 function addSample() {
   const samples = [
-    { name:'Emma Johnson', title:'Senior Purchasing Manager', type:'brand', company:'Arctic Fox Outerwear', country:'Canada', email:'emma.j@arcticfox.ca', phone:'+1-403-555-0192', linkedin:'linkedin.com/in/emmajohnson', source:'arcticfox.ca', addedDate: new Date().toLocaleDateString('zh-CN')},
-    { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', phone:'+49-89-555-0156', linkedin:'linkedin.com/in/larsmuller', source:'alpinewear.de', addedDate: new Date().toLocaleDateString('zh-CN')},
-    { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', phone:'+81-90-5555-0234', linkedin:'—', source:'northpeak.jp', addedDate: new Date().toLocaleDateString('zh-CN')},
-    { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', phone:'+33-1-5555-0178', linkedin:'linkedin.com/in/sophiemartin', source:'blancalpine.fr', addedDate: new Date().toLocaleDateString('zh-CN')},
+    { name:'Emma Johnson', title:'Senior Purchasing Manager', type:'brand', company:'Arctic Fox Outerwear', country:'Canada', email:'emma.j@arcticfox.ca', phone:'+1-403-555-0192', linkedin:'linkedin.com/in/emmajohnson', source:'LinkedIn' },
+    { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', phone:'+49-89-555-0156', linkedin:'linkedin.com/in/larsmuller', source:'LinkedIn' },
+    { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', phone:'+81-90-5555-0234', linkedin:'—', source:'Company Directory' },
+    { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', phone:'+33-1-5555-0178', linkedin:'linkedin.com/in/sophiemartin', source:'ZoomInfo' },
   ];
   const existKeys = new Set(rows.map(dk));
   let added = 0;
@@ -590,11 +618,13 @@ async function sendAIMessage() {
   
   try {
     // AI 响应
-    const aiPrompt = `You are a helpful assistant for a down jacket supplier lead data collection tool. The user has ${rows.length} leads with ${phoneCount} phone numbers. Help them with: data collection tips, lead qualification, outreach strategies, and tool usage. Be concise in Chinese.
+    const aiPrompt = `You are a helpful assistant for a down jacket supplier lead data collection tool. The user has ${rows.length} leads with ${phoneCount} phone numbers. Help them with: data collection optimization, contact finding strategies, and lead management.
 
 User question: ${msg}
 
-Relevant context: Total leads: ${rows.length}, Leads with phones: ${phoneCount}, Leads by type - Brand: ${rows.filter(r=>r.type==='brand').length}, Factory: ${rows.filter(r=>r.type==='factory').length}`;
+Relevant context: Total leads: ${rows.length}, Leads with phones: ${phoneCount}, Leads by type - Brand: ${rows.filter(r=>r.type==='brand').length}, Factory: ${rows.filter(r=>r.type==='factory').length}, Agent: ${rows.filter(r=>r.type==='agent').length}
+    
+Please answer in Chinese and provide practical advice.`;
     
     const response = await callAPI(aiPrompt, false);
     aiMessages.push({ role: 'assistant', content: response });

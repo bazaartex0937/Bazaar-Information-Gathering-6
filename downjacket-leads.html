@@ -15,6 +15,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hbadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
 .hb1{background:#1e3a5f;color:#93c5fd}
 .hb2{background:#14302a;color:#86efac}
+.hd-ai{cursor:pointer;font-size:18px;opacity:.7;transition:opacity .2s}
+.hd-ai:hover{opacity:1}
 
 /* TOOLBAR */
 .tb{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -29,7 +31,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-red{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
 .btn-green{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
 
-/* API TEST */
+/* API TEST & CONNECTOR */
 .api-test{margin:12px 20px 0;background:#fef9e7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .api-test span{font-size:13px;color:#92400e}
 .api-status{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
@@ -47,7 +49,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .log-wrap{margin:0 20px 8px;display:none}
 .log-wrap.show{display:block}
 .log-head{background:#1e293b;color:#94a3b8;padding:6px 12px;border-radius:8px 8px 0 0;font-size:11px;display:flex;justify-content:space-between;align-items:center}
-.log-body{background:#0f172a;color:#94a3b8;font-family:monospace;font-size:11px;padding:8px 12px;max-height:130px;overflow-y:auto;border-radius:0 0 8px 8px;border:1px solid #1e293b;border-top:none}
+.log-body{background:#0f172a;color:#94a3b8;font-family:monospace;font-size:11px;padding:8px 12px;max-height:150px;overflow-y:auto;border-radius:0 0 8px 8px;border:1px solid #1e293b;border-top:none}
 .lo{color:#60a5fa}.le{color:#f87171}.ls{color:#4ade80}.lw{color:#fbbf24}
 
 /* PROGRESS */
@@ -75,6 +77,8 @@ tr:hover td{background:#fafbff}
 .tnew{background:#dbeafe;color:#1d4ed8;font-size:9px;margin-left:3px;padding:1px 4px;border-radius:2px}
 .email-cell{color:#2563eb;cursor:pointer}
 .email-cell:hover{text-decoration:underline}
+.phone-cell{color:#10b981;cursor:pointer;font-weight:500}
+.phone-cell:hover{text-decoration:underline}
 .del-btn{color:#dc2626;cursor:pointer;opacity:.4;font-size:18px;line-height:1;background:none;border:none;padding:0 2px}
 .del-btn:hover{opacity:1}
 
@@ -84,17 +88,48 @@ tr:hover td{background:#fafbff}
 .empty p{font-size:13px;line-height:1.8}
 
 /* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1;pointer-events:auto}
+
+/* AI ASSISTANT MODAL */
+.ai-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.ai-modal.show{display:flex}
+.ai-panel{background:#fff;border-radius:12px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 25px rgba(0,0,0,0.15)}
+.ai-header{background:#1e293b;color:#fff;padding:15px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+.ai-header h3{font-size:16px;font-weight:600}
+.ai-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7}
+.ai-close:hover{opacity:1}
+.ai-messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:12px}
+.ai-msg{padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.5;max-width:95%}
+.ai-msg.user{background:#dbeafe;color:#0c4a6e;align-self:flex-end}
+.ai-msg.assistant{background:#f0fdf4;color:#166534;border-left:3px solid #16a34a}
+.ai-input-wrap{padding:12px;border-top:1px solid #e2e8f0;display:flex;gap:8px}
+.ai-input-wrap input{flex:1;border:1px solid #cbd5e1;border-radius:6px;padding:8px 12px;font-size:13px;outline:none}
+.ai-input-wrap input:focus{border-color:#3b82f6;box-shadow:0 0 0 2px #dbeafe}
+.ai-input-wrap button{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500}
+.ai-input-wrap button:hover{opacity:.9}
+.ai-input-wrap button:disabled{opacity:.5;cursor:not-allowed}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  .tb{flex-direction:column}
+  .tb input, .tb select{width:100%}
+  .ai-panel{width:95%;max-height:90vh}
+  table{font-size:12px}
+  td{padding:6px 8px}
+}
 </style>
 </head>
 <body>
 
 <div class="hd">
   <div class="hd-logo">🪶 羽绒服采购专员数据采集</div>
-  <div class="hd-badges">
-    <span class="hbadge hb1">今日 <b id="b1">0</b>/50</span>
-    <span class="hbadge hb2">累计 <b id="b2">0</b></span>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="hd-ai" onclick="openAIAssistant()" title="打开AI助手">🤖</div>
+    <div class="hd-badges">
+      <span class="hbadge hb1">今日 <b id="b1">0</b>/50</span>
+      <span class="hbadge hb2">累计 <b id="b2">0</b></span>
+    </div>
   </div>
 </div>
 
@@ -122,9 +157,10 @@ tr:hover td{background:#fafbff}
 
 <!-- API 连接测试条 -->
 <div class="api-test">
-  <span>⚡ 采集前请先测试 AI 连接是否正常</span>
+  <span>⚡ 采集前请先测试 API 连接和网络连通性</span>
   <div style="display:flex;gap:8px;align-items:center">
     <span class="api-status as-idle" id="apiStatus">未测试</span>
+    <span class="api-status as-idle" id="netStatus" style="margin-left:4px">网络: —</span>
     <button class="btn btn-gray" style="padding:5px 12px;font-size:12px" onclick="testAPI()">测试连接</button>
   </div>
 </div>
@@ -135,6 +171,7 @@ tr:hover td{background:#fafbff}
   <div class="stat"><div class="sn" id="s2">0</div><div class="sl">品牌采购</div></div>
   <div class="stat"><div class="sn" id="s3">0</div><div class="sl">工厂采购</div></div>
   <div class="stat"><div class="sn" id="s4">0</div><div class="sl">本次去重</div></div>
+  <div class="stat"><div class="sn" id="s5">0</div><div class="sl">获得电话</div></div>
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -156,16 +193,31 @@ tr:hover td{background:#fafbff}
   <div class="empty" id="emptyEl">
     <div style="font-size:48px">🔍</div>
     <h3>暂无数据</h3>
-    <p>点击「测试连接」确认 AI 可用<br>然后点击「开始采集」自动提取采购专员信息<br>或点击「添加示例」查看表格效果</p>
+    <p>点击「测试连接」确认 API 和网络可用<br>然后点击「开始采集」自动提取采购专员信息<br>或点击「添加示例」查看表格效果</p>
   </div>
   <table id="mainTable" style="display:none">
     <thead><tr>
       <th>#</th><th>姓名</th><th>职位</th><th>类型</th>
       <th>公司</th><th>国家</th><th>邮箱（点击复制）</th>
-      <th>LinkedIn</th><th>来源</th><th>日期</th><th></th>
+      <th>电话（点击复制）</th><th>LinkedIn</th><th>来源</th><th>日期</th><th></th>
     </tr></thead>
     <tbody id="tbody"></tbody>
   </table>
+</div>
+
+<!-- AI Assistant Modal -->
+<div class="ai-modal" id="aiModal">
+  <div class="ai-panel">
+    <div class="ai-header">
+      <h3>🤖 AI智能助手</h3>
+      <button class="ai-close" onclick="closeAIAssistant()">✕</button>
+    </div>
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-input-wrap">
+      <input type="text" id="aiInput" placeholder="提问：如何优化采集效率？" onkeypress="handleAIKeypress(event)">
+      <button onclick="sendAIMessage()" id="aiSendBtn">发送</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -176,27 +228,51 @@ const TODAY = new Date().toDateString();
 let rows = [];
 let todayCount = 0;
 let lastDup = 0;
+let phoneCount = 0;
 
 // ─── 尝试从 storage 加载 ───
 (async () => {
   try {
-    const r = await window.storage.get('dj_v4');
+    const r = await window.storage?.get('dj_v5');
     if (r && r.value) {
       const d = JSON.parse(r.value);
       rows = d.rows || [];
       todayCount = (d.date === TODAY) ? (d.todayCount || 0) : 0;
+      phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
       log('i', `📂 已加载历史数据 ${rows.length} 条`);
     }
   } catch(e) {
-    // storage 不可用 → 内存模式，不影响其他功能
+    log('w', `Storage加载失败: ${e.message} | 使用内存模式`);
   }
-  render(); updateStats();
+  autoConnectNetwork();
+  render(); 
+  updateStats();
 })();
 
 async function save() {
   try {
-    await window.storage.set('dj_v4', JSON.stringify({ rows, date: TODAY, todayCount }));
+    await window.storage?.set('dj_v5', JSON.stringify({ rows, date: TODAY, todayCount }));
   } catch(e) {}
+}
+
+// ─── 自动网络连接 ───
+async function autoConnectNetwork() {
+  try {
+    const st = document.getElementById('netStatus');
+    const response = await fetch('https://www.google.com/generate_204', { 
+      method: 'HEAD',
+      mode: 'no-cors',
+      cache: 'no-store'
+    });
+    st.className = 'api-status as-ok';
+    st.textContent = '🌐 网络正常';
+    log('i', '🌐 网络连接正常');
+  } catch(e) {
+    const st = document.getElementById('netStatus');
+    st.className = 'api-status as-fail';
+    st.textContent = '❌ 网络异常';
+    log('w', '⚠️ 网络连接失败，将使用缓存数据');
+  }
 }
 
 // ─── 去重 key ───
@@ -213,10 +289,11 @@ async function testAPI() {
   st.className = 'api-status as-idle'; st.textContent = '连接中…';
   showErr('');
   try {
+    await autoConnectNetwork();
     const res = await callAPI('请用一句话（中文）介绍你自己。', false);
     if (res) {
-      st.className = 'api-status as-ok'; st.textContent = '✅ 连接正常';
-      showToast('AI 连接正常，可以开始采集！');
+      st.className = 'api-status as-ok'; st.textContent = '✅ API正常';
+      showToast('✅ 网络和AI都正常，可以开始采集！');
     } else {
       throw new Error('无返回内容');
     }
@@ -227,55 +304,81 @@ async function testAPI() {
   btn.disabled = false; btn.textContent = '测试连接';
 }
 
-// ─── 核心 API 调用 ───
-async function callAPI(userMsg, useSearch = true) {
-  const body = {
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: userMsg }]
-  };
-  if (useSearch) {
-    body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+// ─── 核心 API 调用（带重试机制）───
+async function callAPI(userMsg, useSearch = true, retries = 2) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const body = {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: userMsg }]
+      };
+      if (useSearch) {
+        body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+      }
+      
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify(body),
+        timeout: 30000
+      });
+      
+      if (!res.ok) {
+        const t = await res.text();
+        if (res.status === 429 && attempt < retries - 1) {
+          log('w', `⚠️ 请求过于频繁，${3000}ms后重试…`);
+          await new Promise(r => setTimeout(r, 3000));
+          continue;
+        }
+        throw new Error(`HTTP ${res.status}: ${t.slice(0,120)}`);
+      }
+      
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    } catch(e) {
+      if (attempt < retries - 1) {
+        log('w', `重试 ${attempt + 1}/${retries}…`);
+        await new Promise(r => setTimeout(r, 2000));
+      } else {
+        throw e;
+      }
+    }
   }
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`HTTP ${res.status}: ${t.slice(0,120)}`);
-  }
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
 }
 
 // ─── 搜索关键词模板 ───
 const QTPLS = [
-  'down jacket brand "purchasing manager" OR "buying manager" email contact',
-  '"puffer jacket" sourcing director buyer email linkedin',
-  'feather jacket outerwear brand procurement officer contact',
-  '"down jacket" factory OEM purchasing contact email',
-  'winter jacket down feather importer buyer email',
-  '"goose down" jacket brand buyer sourcing contact',
-  'outdoor apparel down jacket purchasing agent email',
-  'ski puffer jacket brand procurement linkedin email',
+  'down jacket brand "purchasing manager" OR "buying manager" email phone contact',
+  '"puffer jacket" sourcing director buyer email phone linkedin',
+  'feather jacket outerwear brand procurement officer contact phone',
+  '"down jacket" factory OEM purchasing contact email phone',
+  'winter jacket down feather importer buyer email phone',
+  '"goose down" jacket brand buyer sourcing contact email',
+  'outdoor apparel down jacket purchasing agent email phone',
+  'ski puffer jacket brand procurement linkedin email phone',
 ];
 
-const PROMPT_SYS = `You are a B2B lead finder. Search the web and extract real purchasing/buying/sourcing professionals who work with DOWN JACKETS, PUFFER JACKETS, or FEATHER OUTERWEAR for foreign (non-Chinese) brands or factories.
+const PROMPT_SYS = `You are a B2B lead finder specializing in down jacket and outerwear industry. Extract REAL purchasing/buying/sourcing professionals.
 
-Return ONLY a valid JSON array. No markdown fences. No explanation. No extra text.
-Format:
-[{"name":"Full Name","title":"Job Title","type":"brand","company":"Company Name","country":"Country","email":"email@example.com","linkedin":"linkedin URL or —","source":"website"}]
+CRITICAL: For each person, actively search for their phone number on LinkedIn, company website, business directories (Dun & Bradstreet, ZoomInfo), or industry databases.
 
-type must be one of: brand (retail/brand buyer), factory (OEM procurement), agent (sourcing agent)
-- Only include real identifiable people
-- email or linkedin should be present when possible, use "—" if truly not found
-- Return 3-7 leads
-- If nothing relevant found, return []`;
+Return ONLY valid JSON array. No markdown. No explanation. Format:
+[{"name":"Full Name","title":"Job Title","type":"brand|factory|agent","company":"Company","country":"Country","email":"email@example.com","phone":"+1-555-0123 or —","linkedin":"url or —","source":"website"}]
+
+Rules:
+- type: brand (retail/brand buyer) | factory (OEM procurement) | agent (sourcing agent)
+- phone: Include country code, format: +X-XXX-XXXX or —
+- Include only identifiable real people
+- 5-8 leads per query
+- If nothing found, return []`;
 
 let running = false;
+let aiMessages = [];
 
 async function startCrawl() {
   if (running) { showToast('采集中，请稍候…'); return; }
@@ -301,26 +404,25 @@ async function startCrawl() {
     if (todayCount + added >= 50) break;
     const q = queries[i];
     setProg(Math.round((i / queries.length) * 88), `搜索 ${i+1}/${queries.length}`);
-    log('i', `🔍 ${q.substring(0, 65)}…`);
+    log('i', `🔍 ${q.substring(0, 70)}…`);
 
     try {
-      const prompt = `${PROMPT_SYS}\n\nSearch query: "${q}"\nExtract purchasing professionals and return JSON array only.`;
+      const prompt = `${PROMPT_SYS}\n\nSearch query: "${q}"\nExtract and return JSON array only.`;
       const txt = await callAPI(prompt, true);
-      log('i', `返回内容长度: ${txt.length} 字符`);
+      log('i', `返回: ${txt.length} 字符`);
 
-      // 解析 JSON，多重容错
       let leads = [];
       try {
         const m = txt.match(/\[[\s\S]*?\]/);
         if (m) leads = JSON.parse(m[0]);
         else leads = JSON.parse(txt.replace(/```json|```/g,'').trim());
       } catch(pe) {
-        log('w', `⚠️ JSON解析失败: ${pe.message} | 原文: ${txt.substring(0,80)}`);
+        log('w', `⚠️ JSON解析失败: ${pe.message.substring(0,40)}`);
         continue;
       }
 
       if (!Array.isArray(leads)) { log('w', '⚠️ 返回格式不是数组'); continue; }
-      log('s', `找到 ${leads.length} 条候选`);
+      log('s', `✅ 找到 ${leads.length} 条候选`);
 
       for (const lead of leads) {
         if (todayCount + added >= 50) break;
@@ -336,24 +438,25 @@ async function startCrawl() {
           isNew: true
         });
         added++;
-        log('s', `✅ ${lead.name || lead.email} | ${lead.company} | ${lead.country}`);
+        const phoneInfo = lead.phone && lead.phone !== '—' ? `📱 ${lead.phone}` : '';
+        log('s', `✅ ${lead.name || lead.email} | ${lead.company} | ${phoneInfo}`);
       }
     } catch(e) {
-      log('e', `❌ 第${i+1}次请求失败: ${e.message}`);
-      showErr(`第 ${i+1} 次请求失败：${e.message}`);
+      log('e', `❌ 第${i+1}次请求失败: ${e.message.substring(0,50)}`);
     }
 
-    await new Promise(r => setTimeout(r, 700));
+    await new Promise(r => setTimeout(r, 800));
   }
 
   todayCount += added;
   lastDup = skipped;
+  phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
   await save();
-  setProg(100, `✅ 完成！新增 ${added} 条，去重 ${skipped} 条`);
+  setProg(100, `✅ 完成！新增 ${added} 条，去重 ${skipped} 条，含电话 ${phoneCount} 个`);
   render(); updateStats();
 
   if (added === 0) showErr('本次未采集到新数据。建议：1) 先点「测试连接」验证API；2) 更换关键词；3) 稍后重试。');
-  else showToast(`✅ 成功新增 ${added} 条数据！`);
+  else showToast(`✅ 成功新增 ${added} 条数据（${phoneCount}个电话）！`);
 
   btn.disabled = false; btn.textContent = '🔍 再次采集';
   running = false;
@@ -362,10 +465,10 @@ async function startCrawl() {
 // ─── 添加示例数据 ───
 function addSample() {
   const samples = [
-    { name:'Emma Johnson', title:'Senior Purchasing Manager', type:'brand', company:'Arctic Fox Outerwear', country:'Canada', email:'emma.j@arcticfox.ca', linkedin:'linkedin.com/in/emmajohnson', source:'arcticfox.ca', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
-    { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', linkedin:'linkedin.com/in/larsmuller', source:'alpinewear.de', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
-    { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', linkedin:'—', source:'northpeak.jp', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
-    { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', linkedin:'linkedin.com/in/sophiemartin', source:'blancalpine.fr', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
+    { name:'Emma Johnson', title:'Senior Purchasing Manager', type:'brand', company:'Arctic Fox Outerwear', country:'Canada', email:'emma.j@arcticfox.ca', phone:'+1-403-555-0192', linkedin:'linkedin.com/in/emmajohnson', source:'arcticfox.ca', addedDate: new Date().toLocaleDateString('zh-CN')},
+    { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', phone:'+49-89-555-0156', linkedin:'linkedin.com/in/larsmuller', source:'alpinewear.de', addedDate: new Date().toLocaleDateString('zh-CN')},
+    { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', phone:'+81-90-5555-0234', linkedin:'—', source:'northpeak.jp', addedDate: new Date().toLocaleDateString('zh-CN')},
+    { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', phone:'+33-1-5555-0178', linkedin:'linkedin.com/in/sophiemartin', source:'blancalpine.fr', addedDate: new Date().toLocaleDateString('zh-CN')},
   ];
   const existKeys = new Set(rows.map(dk));
   let added = 0;
@@ -374,17 +477,18 @@ function addSample() {
     const k = dk(s);
     if (!existKeys.has(k)) { existKeys.add(k); rows.unshift(s); added++; }
   }
+  phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
   save(); render(); updateStats();
-  showToast(`已添加 ${added} 条示例数据`);
+  showToast(`已添加 ${added} 条示例数据（包含电话）`);
 }
 
 // ─── 导出 CSV ───
 function exportCSV() {
   if (!rows.length) { showToast('暂无数据，请先采集或添加示例'); return; }
-  const h = ['序号','姓名','职位','类型','公司','国家','邮箱','LinkedIn','来源','日期'];
+  const h = ['序号','姓名','职位','类型','公司','国家','邮箱','电话','LinkedIn','来源','日期'];
   const TL = { brand:'品牌', factory:'工厂', agent:'代理' };
   const body = rows.map((r,i) =>
-    [i+1, r.name, r.title, TL[r.type]||r.type, r.company, r.country, r.email, r.linkedin, r.source, r.addedDate]
+    [i+1, r.name, r.title, TL[r.type]||r.type, r.company, r.country, r.email, r.phone, r.linkedin, r.source, r.addedDate]
     .map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')
   );
   const csv = '\uFEFF' + [h.join(','), ...body].join('\r\n');
@@ -392,14 +496,14 @@ function exportCSV() {
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = `羽绒服采购专员_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.csv`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  showToast(`✅ 已导出 ${rows.length} 条数据`);
+  showToast(`✅ 已导出 ${rows.length} 条数据（含电话）`);
 }
 
 // ─── 清空 ───
 function doClear() {
   if (!rows.length) { showToast('已经没有数据了'); return; }
   if (!confirm(`确定清空全部 ${rows.length} 条数据？`)) return;
-  rows = []; todayCount = 0; lastDup = 0;
+  rows = []; todayCount = 0; lastDup = 0; phoneCount = 0;
   save(); render(); updateStats();
   showProg(false); showLog(false); showErr('');
   showToast('已清空');
@@ -408,6 +512,7 @@ function doClear() {
 // ─── 删除单行 ───
 function delRow(id) {
   rows = rows.filter(r => r.id !== id);
+  phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
   save(); render(); updateStats();
 }
 
@@ -415,11 +520,18 @@ function delRow(id) {
 function copyEmail(txt) {
   if (!txt || txt === '—') { showToast('无邮箱可复制'); return; }
   navigator.clipboard.writeText(txt)
-    .then(() => showToast('已复制：' + txt))
-    .catch(() => { prompt('手动复制：', txt); });
+    .then(() => showToast('✅ 已复制邮箱'))
+    .catch(() => { prompt('手动复制邮箱：', txt); });
 }
 
-// ─── 渲染 ───
+function copyPhone(txt) {
+  if (!txt || txt === '—') { showToast('无电话可复制'); return; }
+  navigator.clipboard.writeText(txt)
+    .then(() => showToast('✅ 已复制电话'))
+    .catch(() => { prompt('手动复制电话：', txt); });
+}
+
+// ─── 渲染表格 ───
 const TL = { brand:'品牌', factory:'工厂', agent:'代理' };
 const TC = { brand:'tbrand', factory:'tfactory', agent:'tagent' };
 function render() {
@@ -436,6 +548,7 @@ function render() {
       <td style="font-weight:500">${r.company||'—'}</td>
       <td>${r.country||'—'}</td>
       <td class="email-cell" onclick="copyEmail('${(r.email||'').replace(/'/g,"\\'")}')">${r.email||'—'}</td>
+      <td class="phone-cell" onclick="copyPhone('${(r.phone||'').replace(/'/g,"\\'")}')">${r.phone||'—'}</td>
       <td>${r.linkedin&&r.linkedin!=='—'?`<a href="${r.linkedin}" target="_blank" style="color:#2563eb;font-size:12px">查看</a>`:'—'}</td>
       <td style="font-size:11px;color:#94a3b8">${r.source||'—'}</td>
       <td style="font-size:11px;color:#94a3b8;white-space:nowrap">${r.addedDate||'—'}</td>
@@ -449,9 +562,80 @@ function updateStats() {
   document.getElementById('s2').textContent = rows.filter(r=>r.type==='brand').length;
   document.getElementById('s3').textContent = rows.filter(r=>r.type==='factory').length;
   document.getElementById('s4').textContent = lastDup;
+  document.getElementById('s5').textContent = phoneCount;
   document.getElementById('b1').textContent = todayCount;
   document.getElementById('b2').textContent = rows.length;
 }
+
+// ─── AI 助手 ───
+async function sendAIMessage() {
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  
+  const sendBtn = document.getElementById('aiSendBtn');
+  sendBtn.disabled = true;
+  
+  const messagesDiv = document.getElementById('aiMessages');
+  
+  // 用户消息
+  aiMessages.push({ role: 'user', content: msg });
+  const userMsgDiv = document.createElement('div');
+  userMsgDiv.className = 'ai-msg user';
+  userMsgDiv.textContent = msg;
+  messagesDiv.appendChild(userMsgDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+  input.value = '';
+  
+  try {
+    // AI 响应
+    const aiPrompt = `You are a helpful assistant for a down jacket supplier lead data collection tool. The user has ${rows.length} leads with ${phoneCount} phone numbers. Help them with: data collection tips, lead qualification, outreach strategies, and tool usage. Be concise in Chinese.
+
+User question: ${msg}
+
+Relevant context: Total leads: ${rows.length}, Leads with phones: ${phoneCount}, Leads by type - Brand: ${rows.filter(r=>r.type==='brand').length}, Factory: ${rows.filter(r=>r.type==='factory').length}`;
+    
+    const response = await callAPI(aiPrompt, false);
+    aiMessages.push({ role: 'assistant', content: response });
+    
+    const aiMsgDiv = document.createElement('div');
+    aiMsgDiv.className = 'ai-msg assistant';
+    aiMsgDiv.textContent = response;
+    messagesDiv.appendChild(aiMsgDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  } catch(e) {
+    const errDiv = document.createElement('div');
+    errDiv.className = 'ai-msg assistant';
+    errDiv.textContent = `❌ 错误: ${e.message}`;
+    messagesDiv.appendChild(errDiv);
+  }
+  
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+function openAIAssistant() {
+  document.getElementById('aiModal').classList.add('show');
+  document.getElementById('aiInput').focus();
+}
+
+function closeAIAssistant() {
+  document.getElementById('aiModal').classList.remove('show');
+}
+
+function handleAIKeypress(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAIMessage();
+  }
+}
+
+// 点击外部关闭 AI 助手
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('aiModal');
+  if (e.target === modal) closeAIAssistant();
+});
 
 // ─── UI helpers ───
 let logLineCount = 0;

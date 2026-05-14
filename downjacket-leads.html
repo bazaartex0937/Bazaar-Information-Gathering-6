@@ -91,30 +91,22 @@ tr:hover td{background:#fafbff}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1;pointer-events:auto}
 
-/* AI ASSISTANT MODAL */
-.ai-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
-.ai-modal.show{display:flex}
-.ai-panel{background:#fff;border-radius:12px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 25px rgba(0,0,0,0.15)}
-.ai-header{background:#1e293b;color:#fff;padding:15px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
-.ai-header h3{font-size:16px;font-weight:600}
-.ai-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7}
-.ai-close:hover{opacity:1}
-.ai-messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:12px}
-.ai-msg{padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.5;max-width:95%}
-.ai-msg.user{background:#dbeafe;color:#0c4a6e;align-self:flex-end}
-.ai-msg.assistant{background:#f0fdf4;color:#166534;border-left:3px solid #16a34a}
-.ai-input-wrap{padding:12px;border-top:1px solid #e2e8f0;display:flex;gap:8px}
-.ai-input-wrap input{flex:1;border:1px solid #cbd5e1;border-radius:6px;padding:8px 12px;font-size:13px;outline:none}
-.ai-input-wrap input:focus{border-color:#3b82f6;box-shadow:0 0 0 2px #dbeafe}
-.ai-input-wrap button{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500}
-.ai-input-wrap button:hover{opacity:.9}
-.ai-input-wrap button:disabled{opacity:.5;cursor:not-allowed}
+/* MODAL */
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.panel{background:#fff;border-radius:12px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 25px rgba(0,0,0,0.15)}
+.panel-header{background:#1e293b;color:#fff;padding:15px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+.panel-header h3{font-size:16px;font-weight:600}
+.close-btn{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7}
+.close-btn:hover{opacity:1}
+.panel-content{flex:1;overflow-y:auto;padding:15px}
+.panel-footer{padding:12px;border-top:1px solid #e2e8f0;display:flex;gap:8px}
 
 /* MOBILE RESPONSIVE */
 @media(max-width:768px){
   .tb{flex-direction:column}
   .tb input, .tb select{width:100%}
-  .ai-panel{width:95%;max-height:90vh}
+  .panel{width:95%;max-height:90vh}
   table{font-size:12px}
   td{padding:6px 8px}
 }
@@ -125,7 +117,7 @@ tr:hover td{background:#fafbff}
 <div class="hd">
   <div class="hd-logo">🪶 羽绒服采购专员数据采集</div>
   <div style="display:flex;align-items:center;gap:16px">
-    <div class="hd-ai" onclick="openAIAssistant()" title="打开AI助手">🤖</div>
+    <div class="hd-ai" onclick="openSettings()" title="设置 API Key">⚙️</div>
     <div class="hd-badges">
       <span class="hbadge hb1">今日 <b id="b1">0</b>/50</span>
       <span class="hbadge hb2">累计 <b id="b2">0</b></span>
@@ -157,11 +149,9 @@ tr:hover td{background:#fafbff}
 
 <!-- API 连接测试条 -->
 <div class="api-test">
-  <span>⚡ 采集前请先测试 API 连接和网络连通性</span>
+  <span id="apiMsg">✅ 已就绪（可直接添加示例或采集数据）</span>
   <div style="display:flex;gap:8px;align-items:center">
-    <span class="api-status as-idle" id="apiStatus">未测试</span>
-    <span class="api-status as-idle" id="netStatus" style="margin-left:4px">网络: —</span>
-    <button class="btn btn-gray" style="padding:5px 12px;font-size:12px" onclick="testAPI()">测试连接</button>
+    <span class="api-status as-ok" id="apiStatus">✅ 就绪</span>
   </div>
 </div>
 
@@ -193,7 +183,7 @@ tr:hover td{background:#fafbff}
   <div class="empty" id="emptyEl">
     <div style="font-size:48px">🔍</div>
     <h3>暂无数据</h3>
-    <p>点击「测试连接」确认 API 和网络可用<br>然后点击「开始采集」自动提取采购专员信息<br>或点击「添加示例」查看表格效果</p>
+    <p>点击「添加示例」查看表格效果<br>或点击「开始采集」自动提取采购专员信息<br>需要真实数据？点击右上角⚙️配置 API Key</p>
   </div>
   <table id="mainTable" style="display:none">
     <thead><tr>
@@ -205,17 +195,33 @@ tr:hover td{background:#fafbff}
   </table>
 </div>
 
-<!-- AI Assistant Modal -->
-<div class="ai-modal" id="aiModal">
-  <div class="ai-panel">
-    <div class="ai-header">
-      <h3>🤖 AI智能助手</h3>
-      <button class="ai-close" onclick="closeAIAssistant()">✕</button>
+<!-- 设置 Modal -->
+<div class="modal" id="settingsModal">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>⚙️ 设置 API Key</h3>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
     </div>
-    <div class="ai-messages" id="aiMessages"></div>
-    <div class="ai-input-wrap">
-      <input type="text" id="aiInput" placeholder="提问：如何优化采集效率？" onkeypress="handleAIKeypress(event)">
-      <button onclick="sendAIMessage()" id="aiSendBtn">发送</button>
+    <div class="panel-content">
+      <p style="margin-bottom:10px;color:#64748b">
+        需要使用 Anthropic Claude API 来获取真实数据。<br>
+        <a href="https://console.anthropic.com/keys" target="_blank" style="color:#2563eb">获取免费 API Key →</a>
+      </p>
+      <label style="display:block;margin-bottom:8px;color:#334155">API Key:</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:12px;font-family:monospace;font-size:12px">
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer">
+        <input type="checkbox" id="showKeyCheck">
+        <span style="color:#64748b">显示密钥</span>
+      </label>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#166534">
+        ✓ API Key 仅存储在浏览器本地<br>
+        ✓ 不会上传到任何服务器<br>
+        ✓ 刷新页面后保留
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-gray" onclick="closeSettings()" style="flex:1">取消</button>
+      <button class="btn btn-blue" onclick="saveAPIKey()" style="flex:1">保存</button>
     </div>
   </div>
 </div>
@@ -223,79 +229,81 @@ tr:hover td{background:#fafbff}
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── 全局数据（内存，每次刷新重置） ───
+// ─── 全局数据 ───
 const TODAY = new Date().toDateString();
 let rows = [];
 let todayCount = 0;
 let lastDup = 0;
 let phoneCount = 0;
+let apiKey = localStorage.getItem('dj_api_key') || '';
 
-// ─── 尝试从 storage 加载 ───
+// ─── 初始化 ───
 (async () => {
   try {
-    const r = await window.storage?.get('dj_v5');
-    if (r && r.value) {
-      const d = JSON.parse(r.value);
+    const r = localStorage.getItem('dj_v5');
+    if (r) {
+      const d = JSON.parse(r);
       rows = d.rows || [];
       todayCount = (d.date === TODAY) ? (d.todayCount || 0) : 0;
       phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
       log('i', `📂 已加载历史数据 ${rows.length} 条`);
     }
   } catch(e) {
-    log('w', `Storage加载失败: ${e.message} | 使用内存模式`);
+    log('w', `Storage加载失败: ${e.message}`);
   }
-  autoConnectNetwork();
   render(); 
   updateStats();
+  updateAPIStatus();
 })();
 
-async function save() {
+function save() {
   try {
-    await window.storage?.set('dj_v5', JSON.stringify({ rows, date: TODAY, todayCount }));
+    localStorage.setItem('dj_v5', JSON.stringify({ rows, date: TODAY, todayCount }));
   } catch(e) {}
 }
 
-// ─── 改进的网络连接检测（多个备选方案） ───
-async function autoConnectNetwork() {
-  const st = document.getElementById('netStatus');
-  
-  // 多个备选检测地址
-  const testUrls = [
-    'https://www.cloudflare.com/cdn-cgi/trace',
-    'https://www.baidu.com/img/baidu_jgylogo3.gif',
-    'https://www.aliyun.com',
-    'https://1.1.1.1/cdn-cgi/trace',
-    'https://dns.google/dns-query'
-  ];
-  
-  for (const url of testUrls) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(url, { 
-        method: 'GET',
-        mode: 'no-cors',
-        cache: 'no-store',
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      st.className = 'api-status as-ok';
-      st.textContent = '🌐 网络正常';
-      log('i', `🌐 网络连接正常 (${url})`);
-      return true;
-    } catch(e) {
-      // 继续尝试下一个
-      log('w', `尝试 ${url} 失败，切换备选…`);
-    }
+// ─── API Key 管理 ───
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('show');
+  document.getElementById('apiKeyInput').value = apiKey;
+  updateKeyDisplay();
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('show');
+}
+
+function saveAPIKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) {
+    showToast('⚠️ 请输入 API Key');
+    return;
   }
-  
-  // 所有检测都失败
-  st.className = 'api-status as-fail';
-  st.textContent = '❌ 网络异常';
-  log('e', '⚠️ 网络连接失败，请检查网络设置。可继续使用缓存数据。');
-  return false;
+  apiKey = key;
+  localStorage.setItem('dj_api_key', key);
+  updateAPIStatus();
+  closeSettings();
+  showToast('✅ API Key 已保存');
+}
+
+document.getElementById('showKeyCheck')?.addEventListener('change', updateKeyDisplay);
+
+function updateKeyDisplay() {
+  const input = document.getElementById('apiKeyInput');
+  const check = document.getElementById('showKeyCheck');
+  input.type = check?.checked ? 'text' : 'password';
+}
+
+function updateAPIStatus() {
+  const st = document.getElementById('apiStatus');
+  const msg = document.getElementById('apiMsg');
+  if (apiKey) {
+    st.textContent = '✅ API已配置';
+    msg.textContent = '✅ 已配置 API Key（可采集真实数据）';
+  } else {
+    st.textContent = '📝 无 API Key';
+    msg.textContent = '📝 未配置 API Key（可添加示例或使用本地数据）';
+  }
 }
 
 // ─── 去重 key ───
@@ -304,31 +312,12 @@ function dk(r) {
   return (e && e !== '—' && e !== '') ? e : (r.name + '|' + r.company).toLowerCase();
 }
 
-// ─── 测试 API ───
-async function testAPI() {
-  const btn = event.target;
-  const st = document.getElementById('apiStatus');
-  btn.disabled = true; btn.textContent = '测试中…';
-  st.className = 'api-status as-idle'; st.textContent = '连接中…';
-  showErr('');
-  try {
-    await autoConnectNetwork();
-    const res = await callAPI('请用一句话（中文）介绍你自己。', false);
-    if (res) {
-      st.className = 'api-status as-ok'; st.textContent = '✅ API正常';
-      showToast('✅ 网络和AI都正常，可以开始采集！');
-    } else {
-      throw new Error('无返回内容');
-    }
-  } catch(e) {
-    st.className = 'api-status as-fail'; st.textContent = '❌ 连接失败';
-    showErr('API 连接失败：' + e.message + '\n请检查网络或刷新页面重试。');
-  }
-  btn.disabled = false; btn.textContent = '测试连接';
-}
-
-// ─── 核心 API 调用（带重试机制）───
+// ─── 核心 API 调用 ───
 async function callAPI(userMsg, useSearch = true, retries = 2) {
+  if (!apiKey) {
+    throw new Error('未配置 API Key，请先点击右上角⚙️进行设置');
+  }
+
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       const body = {
@@ -347,7 +336,8 @@ async function callAPI(userMsg, useSearch = true, retries = 2) {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'anthropic-version': '2023-06-01'
+          'anthropic-version': '2023-06-01',
+          'x-api-key': apiKey
         },
         body: JSON.stringify(body),
         signal: controller.signal
@@ -357,6 +347,9 @@ async function callAPI(userMsg, useSearch = true, retries = 2) {
       
       if (!res.ok) {
         const t = await res.text();
+        if (res.status === 401) {
+          throw new Error('API Key 无效，请检查设置');
+        }
         if (res.status === 429 && attempt < retries - 1) {
           log('w', `⚠️ 请求过于频繁，${3000}ms后重试…`);
           await new Promise(r => setTimeout(r, 3000));
@@ -393,8 +386,6 @@ const QTPLS = [
 
 const PROMPT_SYS = `You are a B2B lead finder specializing in down jacket and outerwear industry. Extract REAL purchasing/buying/sourcing professionals.
 
-CRITICAL: For each person, actively search for their phone number on LinkedIn, company website, business directories (Dun & Bradstreet, ZoomInfo), or industry databases.
-
 Return ONLY valid JSON array. No markdown. No explanation. Format:
 [{"name":"Full Name","title":"Job Title","type":"brand|factory|agent","company":"Company","country":"Country","email":"email@example.com","phone":"+1-555-0123 or —","linkedin":"url or —","source":"..."}]
 
@@ -406,10 +397,13 @@ Rules:
 - If nothing found, return []`;
 
 let running = false;
-let aiMessages = [];
 
 async function startCrawl() {
   if (running) { showToast('采集中，请稍候…'); return; }
+  if (!apiKey) {
+    showToast('⚠️ 需要配置 API Key，点击右上角⚙️');
+    return;
+  }
   if (todayCount >= 50) { showToast('今日配额已满（50条），明天再来'); return; }
 
   running = true;
@@ -479,11 +473,11 @@ async function startCrawl() {
   todayCount += added;
   lastDup = skipped;
   phoneCount = rows.filter(r => r.phone && r.phone !== '—').length;
-  await save();
+  save();
   setProg(100, `✅ 完成！新增 ${added} 条，去重 ${skipped} 条，含电话 ${phoneCount} 个`);
   render(); updateStats();
 
-  if (added === 0) showErr('本次未采集到新数据。建议：1) 先点「测试连接」验证API；2) 更换关键词；3) 稍后重试。');
+  if (added === 0) showErr('本次未采集到新数据。建议：1) 更换关键词；2) 稍后重试。');
   else showToast(`✅ 成功新增 ${added} 条数据（${phoneCount}个电话）！`);
 
   btn.disabled = false; btn.textContent = '🔍 再次采集';
@@ -497,6 +491,8 @@ function addSample() {
     { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', phone:'+49-89-555-0156', linkedin:'linkedin.com/in/larsmuller', source:'LinkedIn' },
     { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', phone:'+81-90-5555-0234', linkedin:'—', source:'Company Directory' },
     { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', phone:'+33-1-5555-0178', linkedin:'linkedin.com/in/sophiemartin', source:'ZoomInfo' },
+    { name:'Alex Chen', title:'Procurement Manager', type:'factory', company:'TechWear Solutions', country:'China', email:'a.chen@techwear.com', phone:'+86-10-5555-0289', linkedin:'linkedin.com/in/alexchen', source:'Global Trade' },
+    { name:'Maria Rodriguez', title:'Sourcing Director', type:'agent', company:'Global Supply Partners', country:'Mexico', email:'m.rodriguez@globalsupply.mx', phone:'+52-55-5555-0145', linkedin:'linkedin.com/in/mariar', source:'Industry Database' },
   ];
   const existKeys = new Set(rows.map(dk));
   let added = 0;
@@ -522,7 +518,7 @@ function exportCSV() {
   const csv = '\uFEFF' + [h.join(','), ...body].join('\r\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = `羽绒服采购专员_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.csv`;
+  a.download = `羽绒服��购专员_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.csv`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   showToast(`✅ 已导出 ${rows.length} 条数据（含电话）`);
 }
@@ -595,78 +591,6 @@ function updateStats() {
   document.getElementById('b2').textContent = rows.length;
 }
 
-// ─── AI 助手 ───
-async function sendAIMessage() {
-  const input = document.getElementById('aiInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-  
-  const sendBtn = document.getElementById('aiSendBtn');
-  sendBtn.disabled = true;
-  
-  const messagesDiv = document.getElementById('aiMessages');
-  
-  // 用户消息
-  aiMessages.push({ role: 'user', content: msg });
-  const userMsgDiv = document.createElement('div');
-  userMsgDiv.className = 'ai-msg user';
-  userMsgDiv.textContent = msg;
-  messagesDiv.appendChild(userMsgDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  
-  input.value = '';
-  
-  try {
-    // AI 响应
-    const aiPrompt = `You are a helpful assistant for a down jacket supplier lead data collection tool. The user has ${rows.length} leads with ${phoneCount} phone numbers. Help them with: data collection optimization, contact finding strategies, and lead management.
-
-User question: ${msg}
-
-Relevant context: Total leads: ${rows.length}, Leads with phones: ${phoneCount}, Leads by type - Brand: ${rows.filter(r=>r.type==='brand').length}, Factory: ${rows.filter(r=>r.type==='factory').length}, Agent: ${rows.filter(r=>r.type==='agent').length}
-    
-Please answer in Chinese and provide practical advice.`;
-    
-    const response = await callAPI(aiPrompt, false);
-    aiMessages.push({ role: 'assistant', content: response });
-    
-    const aiMsgDiv = document.createElement('div');
-    aiMsgDiv.className = 'ai-msg assistant';
-    aiMsgDiv.textContent = response;
-    messagesDiv.appendChild(aiMsgDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } catch(e) {
-    const errDiv = document.createElement('div');
-    errDiv.className = 'ai-msg assistant';
-    errDiv.textContent = `❌ 错误: ${e.message}`;
-    messagesDiv.appendChild(errDiv);
-  }
-  
-  sendBtn.disabled = false;
-  input.focus();
-}
-
-function openAIAssistant() {
-  document.getElementById('aiModal').classList.add('show');
-  document.getElementById('aiInput').focus();
-}
-
-function closeAIAssistant() {
-  document.getElementById('aiModal').classList.remove('show');
-}
-
-function handleAIKeypress(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendAIMessage();
-  }
-}
-
-// 点击外部关闭 AI 助手
-document.addEventListener('click', function(e) {
-  const modal = document.getElementById('aiModal');
-  if (e.target === modal) closeAIAssistant();
-});
-
 // ─── UI helpers ───
 let logLineCount = 0;
 function log(type, msg) {
@@ -697,6 +621,12 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+// 点击外部关闭设置
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('settingsModal');
+  if (e.target === modal) closeSettings();
+});
 </script>
 </body>
 </html>

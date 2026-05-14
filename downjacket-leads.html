@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>羽绒服采购数据采集</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px;min-height:100vh}
+
+/* HEADER */
+.hd{background:#1e293b;color:#fff;padding:0 20px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.hd-logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.hd-badges{display:flex;gap:8px}
+.hbadge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.hb1{background:#1e3a5f;color:#93c5fd}
+.hb2{background:#14302a;color:#86efac}
+
+/* TOOLBAR */
+.tb{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tb input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:6px;padding:7px 11px;font-size:13px;outline:none}
+.tb input:focus{border-color:#3b82f6;box-shadow:0 0 0 2px #dbeafe}
+.tb select{border:1px solid #cbd5e1;border-radius:6px;padding:7px 10px;font-size:13px;background:#fff;cursor:pointer;outline:none}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.82}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-gray{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+.btn-red{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.btn-green{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
+
+/* API TEST */
+.api-test{margin:12px 20px 0;background:#fef9e7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.api-test span{font-size:13px;color:#92400e}
+.api-status{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
+.as-ok{background:#dcfce7;color:#16a34a}
+.as-fail{background:#fee2e2;color:#dc2626}
+.as-idle{background:#f1f5f9;color:#64748b}
+
+/* STATS */
+.stats{display:flex;gap:8px;padding:12px 20px;flex-wrap:wrap}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;min-width:100px;flex:1}
+.sn{font-size:22px;font-weight:700;color:#2563eb;letter-spacing:-.5px}
+.sl{font-size:11px;color:#64748b;margin-top:2px}
+
+/* LOG PANEL */
+.log-wrap{margin:0 20px 8px;display:none}
+.log-wrap.show{display:block}
+.log-head{background:#1e293b;color:#94a3b8;padding:6px 12px;border-radius:8px 8px 0 0;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.log-body{background:#0f172a;color:#94a3b8;font-family:monospace;font-size:11px;padding:8px 12px;max-height:130px;overflow-y:auto;border-radius:0 0 8px 8px;border:1px solid #1e293b;border-top:none}
+.lo{color:#60a5fa}.le{color:#f87171}.ls{color:#4ade80}.lw{color:#fbbf24}
+
+/* PROGRESS */
+.prog-wrap{margin:0 20px 8px;display:none}
+.prog-wrap.show{display:block}
+.prog-bar{height:6px;background:#e2e8f0;border-radius:20px;overflow:hidden}
+.prog-fill{height:100%;background:#2563eb;border-radius:20px;transition:width .3s}
+.prog-txt{display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-top:4px}
+
+/* ERROR BOX */
+.err-box{margin:8px 20px;background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;display:none}
+.err-box.show{display:block}
+
+/* TABLE */
+.tbl-wrap{padding:0 20px 30px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden}
+th{background:#f8fafc;padding:9px 10px;text-align:left;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px}
+.tbrand{background:#fef3c7;color:#92400e}
+.tfactory{background:#d1fae5;color:#065f46}
+.tagent{background:#ede9fe;color:#5b21b6}
+.tnew{background:#dbeafe;color:#1d4ed8;font-size:9px;margin-left:3px;padding:1px 4px;border-radius:2px}
+.email-cell{color:#2563eb;cursor:pointer}
+.email-cell:hover{text-decoration:underline}
+.del-btn{color:#dc2626;cursor:pointer;opacity:.4;font-size:18px;line-height:1;background:none;border:none;padding:0 2px}
+.del-btn:hover{opacity:1}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:#94a3b8}
+.empty h3{font-size:16px;margin:.8rem 0 .4rem;color:#475569}
+.empty p{font-size:13px;line-height:1.8}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-logo">🪶 羽绒服采购专员数据采集</div>
+  <div class="hd-badges">
+    <span class="hbadge hb1">今日 <b id="b1">0</b>/50</span>
+    <span class="hbadge hb2">累计 <b id="b2">0</b></span>
+  </div>
+</div>
+
+<div class="tb">
+  <input id="kw" placeholder="关键词（可选）：品牌名 / 国家 / 产品类型">
+  <select id="ftype">
+    <option value="all">全部类型</option>
+    <option value="brand">品牌采购</option>
+    <option value="factory">工厂采购</option>
+    <option value="agent">采购代理</option>
+  </select>
+  <select id="fregion">
+    <option value="">全部地区</option>
+    <option value="European">欧洲</option>
+    <option value="North American">北美</option>
+    <option value="Japanese Korean">日韩</option>
+    <option value="Southeast Asian">东南亚</option>
+    <option value="Middle Eastern">中东</option>
+  </select>
+  <button class="btn btn-blue" id="runBtn" onclick="startCrawl()">🔍 开始采集</button>
+  <button class="btn btn-green" onclick="exportCSV()">⬇ 导出CSV</button>
+  <button class="btn btn-gray" onclick="addSample()">➕ 添加示例</button>
+  <button class="btn btn-red" onclick="doClear()">🗑 清空</button>
+</div>
+
+<!-- API 连接测试条 -->
+<div class="api-test">
+  <span>⚡ 采集前请先测试 AI 连接是否正常</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="api-status as-idle" id="apiStatus">未测试</span>
+    <button class="btn btn-gray" style="padding:5px 12px;font-size:12px" onclick="testAPI()">测试连接</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="sn" id="s0">0</div><div class="sl">累计采集</div></div>
+  <div class="stat"><div class="sn" id="s1">0</div><div class="sl">今日新增</div></div>
+  <div class="stat"><div class="sn" id="s2">0</div><div class="sl">品牌采购</div></div>
+  <div class="stat"><div class="sn" id="s3">0</div><div class="sl">工厂采购</div></div>
+  <div class="stat"><div class="sn" id="s4">0</div><div class="sl">本次去重</div></div>
+</div>
+
+<div class="err-box" id="errBox"></div>
+
+<div class="prog-wrap" id="progWrap">
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-txt"><span id="progMsg">准备中…</span><span id="progPct">0%</span></div>
+</div>
+
+<div class="log-wrap" id="logWrap">
+  <div class="log-head">
+    <span>📡 实时日志</span>
+    <span id="logCount">0 条</span>
+  </div>
+  <div class="log-body" id="logBody"></div>
+</div>
+
+<div class="tbl-wrap">
+  <div class="empty" id="emptyEl">
+    <div style="font-size:48px">🔍</div>
+    <h3>暂无数据</h3>
+    <p>点击「测试连接」确认 AI 可用<br>然后点击「开始采集」自动提取采购专员信息<br>或点击「添加示例」查看表格效果</p>
+  </div>
+  <table id="mainTable" style="display:none">
+    <thead><tr>
+      <th>#</th><th>姓名</th><th>职位</th><th>类型</th>
+      <th>公司</th><th>国家</th><th>邮箱（点击复制）</th>
+      <th>LinkedIn</th><th>来源</th><th>日期</th><th></th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── 全局数据（内存，每次刷新重置） ───
+const TODAY = new Date().toDateString();
+let rows = [];
+let todayCount = 0;
+let lastDup = 0;
+
+// ─── 尝试从 storage 加载 ───
+(async () => {
+  try {
+    const r = await window.storage.get('dj_v4');
+    if (r && r.value) {
+      const d = JSON.parse(r.value);
+      rows = d.rows || [];
+      todayCount = (d.date === TODAY) ? (d.todayCount || 0) : 0;
+      log('i', `📂 已加载历史数据 ${rows.length} 条`);
+    }
+  } catch(e) {
+    // storage 不可用 → 内存模式，不影响其他功能
+  }
+  render(); updateStats();
+})();
+
+async function save() {
+  try {
+    await window.storage.set('dj_v4', JSON.stringify({ rows, date: TODAY, todayCount }));
+  } catch(e) {}
+}
+
+// ─── 去重 key ───
+function dk(r) {
+  const e = (r.email || '').trim().toLowerCase();
+  return (e && e !== '—' && e !== '') ? e : (r.name + '|' + r.company).toLowerCase();
+}
+
+// ─── 测试 API ───
+async function testAPI() {
+  const btn = event.target;
+  const st = document.getElementById('apiStatus');
+  btn.disabled = true; btn.textContent = '测试中…';
+  st.className = 'api-status as-idle'; st.textContent = '连接中…';
+  showErr('');
+  try {
+    const res = await callAPI('请用一句话（中文）介绍你自己。', false);
+    if (res) {
+      st.className = 'api-status as-ok'; st.textContent = '✅ 连接正常';
+      showToast('AI 连接正常，可以开始采集！');
+    } else {
+      throw new Error('无返回内容');
+    }
+  } catch(e) {
+    st.className = 'api-status as-fail'; st.textContent = '❌ 连接失败';
+    showErr('API 连接失败：' + e.message + '\n请检查网络或刷新页面重试。');
+  }
+  btn.disabled = false; btn.textContent = '测试连接';
+}
+
+// ─── 核心 API 调用 ───
+async function callAPI(userMsg, useSearch = true) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1500,
+    messages: [{ role: 'user', content: userMsg }]
+  };
+  if (useSearch) {
+    body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`HTTP ${res.status}: ${t.slice(0,120)}`);
+  }
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+}
+
+// ─── 搜索关键词模板 ───
+const QTPLS = [
+  'down jacket brand "purchasing manager" OR "buying manager" email contact',
+  '"puffer jacket" sourcing director buyer email linkedin',
+  'feather jacket outerwear brand procurement officer contact',
+  '"down jacket" factory OEM purchasing contact email',
+  'winter jacket down feather importer buyer email',
+  '"goose down" jacket brand buyer sourcing contact',
+  'outdoor apparel down jacket purchasing agent email',
+  'ski puffer jacket brand procurement linkedin email',
+];
+
+const PROMPT_SYS = `You are a B2B lead finder. Search the web and extract real purchasing/buying/sourcing professionals who work with DOWN JACKETS, PUFFER JACKETS, or FEATHER OUTERWEAR for foreign (non-Chinese) brands or factories.
+
+Return ONLY a valid JSON array. No markdown fences. No explanation. No extra text.
+Format:
+[{"name":"Full Name","title":"Job Title","type":"brand","company":"Company Name","country":"Country","email":"email@example.com","linkedin":"linkedin URL or —","source":"website"}]
+
+type must be one of: brand (retail/brand buyer), factory (OEM procurement), agent (sourcing agent)
+- Only include real identifiable people
+- email or linkedin should be present when possible, use "—" if truly not found
+- Return 3-7 leads
+- If nothing relevant found, return []`;
+
+let running = false;
+
+async function startCrawl() {
+  if (running) { showToast('采集中，请稍候…'); return; }
+  if (todayCount >= 50) { showToast('今日配额已满（50条），明天再来'); return; }
+
+  running = true;
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.textContent = '采集中…';
+  showErr('');
+  showProg(true); clearLog(); showLog(true);
+
+  const kw = document.getElementById('kw').value.trim();
+  const region = document.getElementById('fregion').value;
+  const ftype = document.getElementById('ftype').value;
+
+  const picked = [...QTPLS].sort(() => Math.random() - .5).slice(0, 5);
+  const queries = picked.map(q => [q, region, kw].filter(Boolean).join(' '));
+
+  const existKeys = new Set(rows.map(dk));
+  let added = 0, skipped = 0;
+
+  for (let i = 0; i < queries.length; i++) {
+    if (todayCount + added >= 50) break;
+    const q = queries[i];
+    setProg(Math.round((i / queries.length) * 88), `搜索 ${i+1}/${queries.length}`);
+    log('i', `🔍 ${q.substring(0, 65)}…`);
+
+    try {
+      const prompt = `${PROMPT_SYS}\n\nSearch query: "${q}"\nExtract purchasing professionals and return JSON array only.`;
+      const txt = await callAPI(prompt, true);
+      log('i', `返回内容长度: ${txt.length} 字符`);
+
+      // 解析 JSON，多重容错
+      let leads = [];
+      try {
+        const m = txt.match(/\[[\s\S]*?\]/);
+        if (m) leads = JSON.parse(m[0]);
+        else leads = JSON.parse(txt.replace(/```json|```/g,'').trim());
+      } catch(pe) {
+        log('w', `⚠️ JSON解析失败: ${pe.message} | 原文: ${txt.substring(0,80)}`);
+        continue;
+      }
+
+      if (!Array.isArray(leads)) { log('w', '⚠️ 返回格式不是数组'); continue; }
+      log('s', `找到 ${leads.length} 条候选`);
+
+      for (const lead of leads) {
+        if (todayCount + added >= 50) break;
+        if (!lead || (!lead.name && !lead.email)) continue;
+        if (ftype !== 'all' && lead.type !== ftype) continue;
+        const k = dk(lead);
+        if (existKeys.has(k)) { skipped++; continue; }
+        existKeys.add(k);
+        rows.unshift({
+          ...lead,
+          id: Date.now() + '_' + Math.random().toString(36).slice(2),
+          addedDate: new Date().toLocaleDateString('zh-CN'),
+          isNew: true
+        });
+        added++;
+        log('s', `✅ ${lead.name || lead.email} | ${lead.company} | ${lead.country}`);
+      }
+    } catch(e) {
+      log('e', `❌ 第${i+1}次请求失败: ${e.message}`);
+      showErr(`第 ${i+1} 次请求失败：${e.message}`);
+    }
+
+    await new Promise(r => setTimeout(r, 700));
+  }
+
+  todayCount += added;
+  lastDup = skipped;
+  await save();
+  setProg(100, `✅ 完成！新增 ${added} 条，去重 ${skipped} 条`);
+  render(); updateStats();
+
+  if (added === 0) showErr('本次未采集到新数据。建议：1) 先点「测试连接」验证API；2) 更换关键词；3) 稍后重试。');
+  else showToast(`✅ 成功新增 ${added} 条数据！`);
+
+  btn.disabled = false; btn.textContent = '🔍 再次采集';
+  running = false;
+}
+
+// ─── 添加示例数据 ───
+function addSample() {
+  const samples = [
+    { name:'Emma Johnson', title:'Senior Purchasing Manager', type:'brand', company:'Arctic Fox Outerwear', country:'Canada', email:'emma.j@arcticfox.ca', linkedin:'linkedin.com/in/emmajohnson', source:'arcticfox.ca', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
+    { name:'Lars Müller', title:'Head of Sourcing', type:'brand', company:'AlpineWear GmbH', country:'Germany', email:'l.muller@alpinewear.de', linkedin:'linkedin.com/in/larsmuller', source:'alpinewear.de', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
+    { name:'Yuki Tanaka', title:'Procurement Specialist', type:'factory', company:'NorthPeak Manufacturing', country:'Japan', email:'y.tanaka@northpeak.jp', linkedin:'—', source:'northpeak.jp', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
+    { name:'Sophie Martin', title:'Buying Director', type:'brand', company:'Blanc Alpine', country:'France', email:'s.martin@blancalpine.fr', linkedin:'linkedin.com/in/sophiemartin', source:'blancalpine.fr', addedDate: new Date().toLocaleDateString('zh-CN'), isNew:true },
+  ];
+  const existKeys = new Set(rows.map(dk));
+  let added = 0;
+  for (const s of samples) {
+    s.id = Date.now() + '_' + Math.random().toString(36).slice(2);
+    const k = dk(s);
+    if (!existKeys.has(k)) { existKeys.add(k); rows.unshift(s); added++; }
+  }
+  save(); render(); updateStats();
+  showToast(`已添加 ${added} 条示例数据`);
+}
+
+// ─── 导出 CSV ───
+function exportCSV() {
+  if (!rows.length) { showToast('暂无数据，请先采集或添加示例'); return; }
+  const h = ['序号','姓名','职位','类型','公司','国家','邮箱','LinkedIn','来源','日期'];
+  const TL = { brand:'品牌', factory:'工厂', agent:'代理' };
+  const body = rows.map((r,i) =>
+    [i+1, r.name, r.title, TL[r.type]||r.type, r.company, r.country, r.email, r.linkedin, r.source, r.addedDate]
+    .map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')
+  );
+  const csv = '\uFEFF' + [h.join(','), ...body].join('\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `羽绒服采购专员_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast(`✅ 已导出 ${rows.length} 条数据`);
+}
+
+// ─── 清空 ───
+function doClear() {
+  if (!rows.length) { showToast('已经没有数据了'); return; }
+  if (!confirm(`确定清空全部 ${rows.length} 条数据？`)) return;
+  rows = []; todayCount = 0; lastDup = 0;
+  save(); render(); updateStats();
+  showProg(false); showLog(false); showErr('');
+  showToast('已清空');
+}
+
+// ─── 删除单行 ───
+function delRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  save(); render(); updateStats();
+}
+
+// ─── 复制 ───
+function copyEmail(txt) {
+  if (!txt || txt === '—') { showToast('无邮箱可复制'); return; }
+  navigator.clipboard.writeText(txt)
+    .then(() => showToast('已复制：' + txt))
+    .catch(() => { prompt('手动复制：', txt); });
+}
+
+// ─── 渲染 ───
+const TL = { brand:'品牌', factory:'工厂', agent:'代理' };
+const TC = { brand:'tbrand', factory:'tfactory', agent:'tagent' };
+function render() {
+  document.getElementById('emptyEl').style.display = rows.length ? 'none' : 'block';
+  const tbl = document.getElementById('mainTable');
+  tbl.style.display = rows.length ? 'table' : 'none';
+  if (!rows.length) return;
+  document.getElementById('tbody').innerHTML = rows.map((r, i) => `
+    <tr>
+      <td style="color:#94a3b8;font-size:12px">${i+1}</td>
+      <td style="font-weight:500;white-space:nowrap">${r.name||'—'}${r.isNew?'<span class="tnew">NEW</span>':''}</td>
+      <td style="color:#475569">${r.title||'—'}</td>
+      <td><span class="tag ${TC[r.type]||'tagent'}">${TL[r.type]||r.type||'—'}</span></td>
+      <td style="font-weight:500">${r.company||'—'}</td>
+      <td>${r.country||'—'}</td>
+      <td class="email-cell" onclick="copyEmail('${(r.email||'').replace(/'/g,"\\'")}')">${r.email||'—'}</td>
+      <td>${r.linkedin&&r.linkedin!=='—'?`<a href="${r.linkedin}" target="_blank" style="color:#2563eb;font-size:12px">查看</a>`:'—'}</td>
+      <td style="font-size:11px;color:#94a3b8">${r.source||'—'}</td>
+      <td style="font-size:11px;color:#94a3b8;white-space:nowrap">${r.addedDate||'—'}</td>
+      <td><button class="del-btn" onclick="delRow('${r.id}')">×</button></td>
+    </tr>`).join('');
+}
+
+function updateStats() {
+  document.getElementById('s0').textContent = rows.length;
+  document.getElementById('s1').textContent = todayCount;
+  document.getElementById('s2').textContent = rows.filter(r=>r.type==='brand').length;
+  document.getElementById('s3').textContent = rows.filter(r=>r.type==='factory').length;
+  document.getElementById('s4').textContent = lastDup;
+  document.getElementById('b1').textContent = todayCount;
+  document.getElementById('b2').textContent = rows.length;
+}
+
+// ─── UI helpers ───
+let logLineCount = 0;
+function log(type, msg) {
+  const body = document.getElementById('logBody');
+  const cls = {i:'lo', e:'le', s:'ls', w:'lw'}[type]||'';
+  body.innerHTML += `<div class="${cls}">${msg}</div>`;
+  body.scrollTop = body.scrollHeight;
+  logLineCount++;
+  document.getElementById('logCount').textContent = logLineCount + ' 条';
+}
+function clearLog() { document.getElementById('logBody').innerHTML=''; logLineCount=0; document.getElementById('logCount').textContent='0 条'; }
+function showLog(v) { document.getElementById('logWrap').classList.toggle('show',v); }
+function showProg(v) { document.getElementById('progWrap').classList.toggle('show',v); }
+function setProg(pct, msg) {
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progMsg').textContent = msg;
+  document.getElementById('progPct').textContent = pct+'%';
+}
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  if (msg) { el.textContent = msg; el.classList.add('show'); }
+  else el.classList.remove('show');
+}
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
